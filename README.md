@@ -132,11 +132,6 @@ export PS1="(chroot) ${PS1}"
 
 ## Installing the base system
 
-Mount the ESP  
-```
-mkdir -p /boot/efi
-mount /dev/nvme0n1p1 /boot/efi
-```
 Get a snapshot of the Gentoo ebuild repo
 ```
 emerge-webrsync
@@ -293,6 +288,12 @@ systemctl enable systemd-timesyncd.service
 ```
 
 ## Configuring the bootloader
+
+Mount the ESP  
+```
+mkdir -p /boot/efi
+mount /dev/nvme0n1p1 /boot/efi
+```
 
 GRUB
 ```
