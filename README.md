@@ -134,7 +134,8 @@ export PS1="(chroot) ${PS1}"
 
 Mount the ESP  
 ```
-mount /dev/nvme0n1p1 /boot
+mkdir -p /boot/efi
+mount /dev/nvme0n1p1 /boot/efi
 ```
 Get a snapshot of the Gentoo ebuild repo
 ```
@@ -296,7 +297,7 @@ systemctl enable systemd-timesyncd.service
 GRUB
 ```
 emerge grub
-grub-install --target=x86_64-efi --efi-directory=/boot
+grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ```
 
 ## Finalizing setup
