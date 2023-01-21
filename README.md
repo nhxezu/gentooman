@@ -87,19 +87,31 @@ tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
 ## Configure Portage
 
+Select mirrors with this nice tool
+```bash
+mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+```
+
 Fire up good ol' nano
 ```
 nano -w /mnt/gentoo/etc/portage/make.conf
 ```
 
-I like to keep things default, so just add `-march=native` to `COMMON_FLAGS` and call it a day
+Add `-march=native` to `COMMON_FLAGS` and call it a day
+
+Additionally, append these lines to `make.conf`
+```bash
+# Self-explanatory
+EMERGE_DEFAULT_OPTS="--ask --verbose --quiet-build"
+
+# USE variable
+USE="dist-kernel"
+
+ACCEPT_LICENSE="@BINARY-REDISTRIBUTABLE"
+VIDEO_CARDS="nvidia"
+```
 
 ## Preparing the chroot environement
-
-**mirrorselect** is a nice tool, let's go for FR and NL mirrors
-```bash
-mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
-```
 
 Configure the base repo
 ```
@@ -152,13 +164,16 @@ eselect profile set 11
 Emerge the world set
 ```
 emerge --ask --verbose --update --deep --newuse @world
+
+# or simply
+emerge -uDN @world
 ```
 
 ## Post-installation tasks
 
 Install these utilities  
 ```
-emerge --ask cpuid2cpuflags bash-completion
+emerge cpuid2cpuflags bash-completion
 ```
 
 Add `CPU_FLAGS_X86`  
@@ -166,15 +181,9 @@ Add `CPU_FLAGS_X86`
 echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 ```
 
-Finally add these two lines to `/etc/portage/make.conf`
-```bash
-ACCEPT_LICENSE="@BINARY-REDISTRIBUTABLE"
-VIDEO_CARDS="nvidia"
+At this point it might be a good idea to remerge
 ```
-
-At this point it might be a good idea to re-run emerge
-```
-emerge -avuDN @world
+emerge -uDN @world
 ```
 
 ## systemd bits
@@ -209,31 +218,20 @@ As usual, the [Gentoo documentation](https://wiki.gentoo.org/wiki/Handbook:AMD64
 
 Install necessary packages for distribution kernels
 ```
-emerge --ask linux-firmware installkernel-gentoo
+emerge linux-firmware installkernel-gentoo
 ```
 
 Build from source
 ```
-emerge --ask sys-kernel/gentoo-kernel
+emerge sys-kernel/gentoo-kernel
 ```
 
 Or get the binary version
 ```
-emerge --ask sys-kernel/gentoo-kernel-bin
+emerge sys-kernel/gentoo-kernel-bin
 ```
 
 ## Install the full desktop environment
-
-Quality of life things
-```bash
-nano -w /etc/portage/make.conf
-
-# USE variable
-USE="dist-kernel"
-
-# Self-explanatory
-EMERGE_DEFAULT_OPTS="--ask --verbose --quiet-build"
-```
 
 Pull entire KDE Plasma
 ```
