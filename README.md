@@ -28,7 +28,7 @@ Block device    | Description                 | Filesystem    | Size
 First, from the livecd, take superadmin powers with `sudo su -`
 
 Make new partitions with fdisk
-```
+```bash
 fdisk -l /dev/nvme0n1
 fdisk /dev/nvme0n1
 ```
@@ -53,13 +53,13 @@ Filesystem/RAID signature on partition 1 will be wiped.
 ```
 
 Make filesystems
-```
+```bash
 mkfs.vfat -F 32 /dev/nvme0n1p1
 mkfs.ext4 /dev/nvme0n1p3
 ```
 
 Swap
-```
+```bash
 mkswap /dev/nvme0n1p2
 swapon /dev/nvme0n1p2
 ```
@@ -69,13 +69,13 @@ Check everything is okay with `lsblk -f`
 ## Installing stage3
 
 Mount the root partition
-```
+```bash
 mkdir -p /mnt/gentoo
 mount /dev/nvme0n1p3 /mnt/gentoo
 ```
 
 Download the [latest stage tarball](https://www.gentoo.org/downloads/#other-arches), we're going for `desktop | systemd | mergedusr`
-```
+```bash
 cd /mnt/gentoo
 wget <PASTED_STAGE_URL>
 ```
@@ -93,7 +93,7 @@ mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
 ```
 
 Fire up good ol' nano
-```
+```bash
 nano -w /mnt/gentoo/etc/portage/make.conf
 ```
 
@@ -114,18 +114,18 @@ VIDEO_CARDS="nvidia"
 ## Preparing the chroot environement
 
 Configure the base repo
-```
+```bash
 mkdir -p /mnt/gentoo/etc/portage/repos.conf
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ```
 
 Copy DNS info, probably shouldn't do this but it's fine
-```
+```bash
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 ```
 
 Mounting the necessary filesystems, [read this](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base#Mounting_the_necessary_filesystems) for more information
-```
+```bash
 mount --types proc /proc /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
 mount --make-rslave /mnt/gentoo/sys
@@ -145,24 +145,24 @@ export PS1="(chroot) ${PS1}"
 ## Installing the base system
 
 Get a snapshot of the Gentoo ebuild repo
-```
+```bash
 emerge-webrsync
 ```
 
 Do the basic maintenance tasks
-```
+```bash
 eselect news list
 eselect news read
 ```
 
 Set desired profile (plasma/systemd/merged-usr)
-```
+```bash
 eselect profile list
 eselect profile set 11
 ```
 
 Emerge the world set
-```
+```bash
 emerge --ask --verbose --update --deep --newuse @world
 
 # or simply
@@ -172,7 +172,7 @@ emerge -uDN @world
 ## Post-installation tasks
 
 Install these utilities  
-```
+```bash
 emerge cpuid2cpuflags bash-completion
 ```
 
@@ -182,19 +182,19 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 ```
 
 At this point it might be a good idea to remerge
-```
+```bash
 emerge -uDN @world
 ```
 
 ## systemd bits
 
 Set timezone
-```
+```bash
 ln -sf ../usr/share/zoneinfo/Europe/Paris /etc/localtime
 ```
 
 Configure locales
-```
+```bash
 nano -w /etc/locale.gen
 
 en_US.UTF-8 UTF-8
@@ -202,7 +202,7 @@ fr_FR.UTF-8 UTF-8
 ```
 
 Followed by  
-```
+```bash
 locale-gen
 eselect locale list
 eselect locale set 4
@@ -217,24 +217,24 @@ As usual, the [Gentoo documentation](https://wiki.gentoo.org/wiki/Handbook:AMD64
 ## Configuring the kernel
 
 Install necessary packages for distribution kernels
-```
+```bash
 emerge linux-firmware installkernel-gentoo
 ```
 
 Build from source
-```
+```bash
 emerge sys-kernel/gentoo-kernel
 ```
 
 Or get the binary version
-```
+```bash
 emerge sys-kernel/gentoo-kernel-bin
 ```
 
 ## Install the full desktop environment
 
 Pull entire KDE Plasma
-```
+```bash
 emerge kde-plasma/plasma-meta
 ```
 Might take a while
@@ -257,7 +257,7 @@ PARTUUID="f700f734-fa98-494d-bafe-6b70aa36674d" /       ext4    defaults        
 More info [here](https://wiki.archlinux.org/title/fstab)
 
 Set root password
-```
+```bash
 passwd
 ```
 
@@ -267,7 +267,7 @@ enforce=none
 ```
 
 Init and boot configuration (systemd)
-```
+```bash
 systemd-firstboot --prompt --setup-machine-id
 systemctl preset-all --preset-mode=enable-only
 ```
@@ -288,13 +288,13 @@ systemctl enable systemd-timesyncd.service
 ## Configuring the bootloader
 
 Mount the ESP  
-```
+```bash
 mkdir -p /boot/efi
 mount /dev/nvme0n1p1 /boot/efi
 ```
 
 GRUB
-```
+```bash
 emerge grub
 grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ```
@@ -302,30 +302,30 @@ grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ## Finalizing setup
 
 Sudo
-```
+```bash
 emerge sudo
 visudo
 ```
 
 Add user
-```
+```bash
 useradd -m -G users,wheel,audio,video -s /bin/bash anon
 passwd anon
 ```
 
 Necessary utilities after reboot
-```
+```bash
 emerge konsole kwrite firefox-bin
 ```
 
 Remove the tarballs
-```
+```bash
 cd /
 rm stage3-amd64-desktop-systemd-*
 ```
 
 Exit the chroot
-```
+```bash
 exit
 cd
 umount -l /mnt/gentoo/dev{/shm,/pts,}
@@ -333,6 +333,6 @@ umount -R /mnt/gentoo
 ```
 
 Brace yourself and
-```
+```bash
 reboot
 ```
