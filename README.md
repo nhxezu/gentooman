@@ -1,5 +1,7 @@
 *This guide makes insane, non-explicit assumptions (aka be me) so do not use it if you are not me!*
 
+We use the [Gentoo Handbook](https://wiki.gentoo.org/wiki/Handbook:AMD64) as a reference
+
 ## Table of contents
 
 - [Preparing the disks](#preparing-the-disks)
